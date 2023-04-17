@@ -35,7 +35,7 @@
     "lodash": "~4.17.21"
   },
   "devDependencies": {
-    "@sqrtthree/tsconfig": "~3.0.0",
+    "@sqrtthree/tsconfig": "~3.1.1",
     "@types/lodash": "~4.14.194",
     "ava": "~5.2.0",
     "dotenv": "~16.0.3",

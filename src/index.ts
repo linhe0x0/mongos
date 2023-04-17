@@ -1,5 +1,6 @@
 import _ from 'lodash'
-import mongoose, { Connection, ConnectOptions } from 'mongoose'
+import mongoose, { Connection } from 'mongoose'
+import type { ConnectOptions } from 'mongoose'
 
 import { makeConnectionURI } from '@sqrtthree/mongoose-helper'
 
@@ -148,20 +149,7 @@ export default class Mongo {
     if (this.connection.readyState === 2) {
       // Ues callback to wait for the connection.
       // https://github.com/Automattic/mongoose/blob/9de60a771e37cc2fcb7af3d805294b49239aed17/lib/connection.js#L708
-      return new Promise((resolve, reject) => {
-        this.connection.openUri(
-          this.connectionURI,
-          this.connectOptions,
-          (err) => {
-            if (err) {
-              reject(err)
-              return
-            }
-
-            resolve(this.connection)
-          }
-        )
-      })
+      return this.connection.openUri(this.connectionURI, this.connectOptions)
     }
 
     return this.connection.openUri(this.connectionURI, this.connectOptions)
