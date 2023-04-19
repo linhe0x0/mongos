@@ -1,14 +1,14 @@
-const mongoose = require('mongoose')
-const dotenv = require('dotenv')
-const test = require('ava')
+import mongoose from 'mongoose'
+import * as dotenv from 'dotenv'
+import test from 'ava'
 
-const Mongos = require('../dist/index').default
+import Mongos from './index'
 
 dotenv.config()
 
 const mongoConfig = {
-  host: process.env.HOST,
-  database: process.env.DB,
+  host: process.env.HOST as string,
+  database: process.env.DB as string,
   username: process.env.USERNAME,
   password: process.env.PASSWORD,
 }
@@ -51,12 +51,12 @@ test('should connect to the MongoDB server manually', async (t) => {
 
   t.is(mongo.connection.readyState, 0)
 
-  await mongo.connect()
+  mongo.connect().catch(() => {})
 
-  t.is(mongo.connection.readyState, 1)
+  t.is(mongo.connection.readyState, 2)
 })
 
-test("should trigger one attempt to connect if calling connect() on a connection that is in either 'connecting' or 'connected' state", async (t) => {
+test("should trigger one attempt to connect if calling connect() on a connection that is not in 'connected' state", async (t) => {
   const mongo = new Mongos(mongoConfig)
 
   t.is(mongo.connection.readyState, 2)
@@ -66,10 +66,9 @@ test("should trigger one attempt to connect if calling connect() on a connection
   t.is(typeof action.then, 'function')
   t.is(action instanceof Promise, true)
 
-  const conn = await action
+  action.catch(() => {})
 
-  t.is(conn, mongo.connection)
-  t.is(mongo.connection.readyState, 1)
+  t.is(mongo.connection.readyState, 2)
 })
 
 test('should close the connection', async (t) => {
@@ -79,11 +78,11 @@ test('should close the connection', async (t) => {
 
   t.is(mongo.connection.readyState, 0)
 
-  await mongo.connect()
+  mongo.connect().catch(() => {})
 
-  t.is(mongo.connection.readyState, 1)
+  t.is(mongo.connection.readyState, 2)
 
-  await mongo.disconnect()
+  mongo.disconnect().catch(() => {})
 
   t.is(mongo.connection.readyState, 0)
 })

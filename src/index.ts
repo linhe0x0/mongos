@@ -6,16 +6,16 @@ import { makeConnectionURI } from '@sqrtthree/mongoose-helper'
 
 interface ExtraHostOption {
   host: string
-  port?: number
+  port?: number | undefined
 }
 interface DBConfig {
   host: string
-  port?: number
-  extras?: ExtraHostOption[]
+  port?: number | undefined
+  extras?: ExtraHostOption[] | undefined
   database: string
-  username?: string
-  password?: string
-  options?: Record<string, string>
+  username?: string | undefined
+  password?: string | undefined
+  options?: Record<string, string> | undefined
 }
 
 interface Logger {
@@ -75,7 +75,7 @@ export default class Mongo {
 
       this.connection.asPromise().catch((err) => {
         this.config.logger.error(
-          `Caught an error occurs on the connection when Mongoose starts making its initial connection to the MongoDB server. Error: ${err.message}`
+          `Caught an error occurs on the connection when Mongoose starts making its initial connection to the MongoDB server. Error: ${err.message}.`
         )
       })
     }
@@ -84,7 +84,7 @@ export default class Mongo {
       let message = `Start making initial connection to the MongoDB database ${this.dbConfig.database}`
 
       if (this.dbConfig.username) {
-        message += ` with user ${this.dbConfig.username}`
+        message += ` with user ${this.dbConfig.username}.`
       }
 
       this.config.logger.debug(message)
@@ -94,7 +94,7 @@ export default class Mongo {
       let message = `Connected to MongoDB database ${this.dbConfig.database}`
 
       if (this.dbConfig.username) {
-        message += ` with user ${this.dbConfig.username}`
+        message += ` with user ${this.dbConfig.username}.`
       }
 
       this.config.logger.info(message)
@@ -124,7 +124,7 @@ export default class Mongo {
 
     this.connection.on('error', (err) => {
       this.config.logger.error(
-        `Caught an error occurs on the connection. Error: ${err.message}`
+        `Caught an error occurs on the connection. Error: ${err.message}.`
       )
       this.config.logger.error(err)
     })
@@ -147,9 +147,14 @@ export default class Mongo {
 
     // connecting
     if (this.connection.readyState === 2) {
-      // Ues callback to wait for the connection.
-      // https://github.com/Automattic/mongoose/blob/9de60a771e37cc2fcb7af3d805294b49239aed17/lib/connection.js#L708
-      return this.connection.openUri(this.connectionURI, this.connectOptions)
+      return new Promise((resolve, reject) => {
+        this.connection.on('connected', () => {
+          resolve(this.connection)
+        })
+        this.connection.on('error', (err) => {
+          reject(err)
+        })
+      })
     }
 
     return this.connection.openUri(this.connectionURI, this.connectOptions)
