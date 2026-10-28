@@ -35,9 +35,3 @@ A logger used to output event messages.
 ### ConnectOptions
 
 See [mongoosejs.com/docs/connections.html#options](https://mongoosejs.com/docs/connections.html#options) to get more details.
-
----
-
-> [sqrtthree.com](https://sqrtthree.com/) &nbsp;&middot;&nbsp;
-> GitHub [@sqrthree](https://github.com/sqrthree) &nbsp;&middot;&nbsp;
-> Twitter [@sqrtthree](https://twitter.com/sqrtthree)
